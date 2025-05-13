@@ -1,3 +1,4 @@
+<!-- CalculationDisplay组件用于显示计算结果或错误信息 -->
 <template>
   <div class="calculation-display">
     <h3>计算结果</h3>
