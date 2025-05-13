@@ -1,4 +1,4 @@
-# Vue2 MathLive Project
+# Vue2 MathLive 动态公式计算器
 
 This project is a Vue 2 application that integrates MathLive for formula editing and uses Compute Engine for dynamic calculations based on user-defined variables.
 

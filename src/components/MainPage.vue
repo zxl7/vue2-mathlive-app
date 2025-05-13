@@ -5,15 +5,18 @@
       <div class="editor-section">
         <h2>公式编辑区</h2>
         <FormulaEditor @formula-updated="handleFormulaUpdate" />
+
         <div class="output-display">
           <strong>LaTeX:</strong>
           {{ currentLatexFormula }}
         </div>
+
         <div class="output-display">
           <strong>MathJSON:</strong>
           {{ currentMathJsonFormulaDisplay }}
         </div>
       </div>
+
       <div class="controls-section">
         <VariableManager @variables-updated="handleVariablesUpdate" />
         <button @click="performCalculation">执行计算</button>
@@ -88,24 +91,23 @@ export default {
             if (!isNaN(numValue)) {
               scope[varName] = numValue
             } else if (varValueStr !== "") {
-              // Allow string variables if needed, though Compute Engine might not use them directly in math calcs
+              // 允许字符串变量（如果需要），尽管计算引擎可能不会直接在数学计算中使用它们
               scope[varName] = varValueStr
             }
           }
         })
 
         let expr
-        // Prefer MathJSON if available for a more structured representation
+        // 优先使用MathJSON（如果可用），以获得更结构化的表示
         if (this.currentMathJsonFormula) {
           expr = this.computeEngine.box(this.currentMathJsonFormula)
         } else {
-          // Fallback to LaTeX if MathJSON is not available
+          // 如果MathJSON不可用，则回退到LaTeX
           expr = this.computeEngine.parse(this.currentLatexFormula)
         }
 
-        // Substitute variables using .subs(scope) and then evaluate
+        // 使用.subs(scope)替换变量然后求值
         const result = expr.subs(scope).evaluate()
-        console.log("%c Line:108 🍓 result", "color:#33a5ff", result);
 
         if (result !== null && result !== undefined) {
           if (result.N !== undefined && typeof result.N === "function") {

@@ -24,13 +24,13 @@ export default {
     const mfe = new MathfieldElement();
     mfe.value = this.initialValue;
     mfe.options = {
-      virtualKeyboardMode: "manual", // or "onfocus", "off"
-      // Add other MathLive options here as needed
+      virtualKeyboardMode: "manual", // 可选值: "onfocus", "off"
+      // 在此添加其他MathLive选项
     };
     this.$refs.mathfield.appendChild(mfe);
     this.mathfield = mfe;
 
-    // Listen for changes in the mathfield
+    // 监听数学编辑器的变化
     this.mathfield.addEventListener("input", (event) => {
       this.$emit("formula-updated", {
         latex: event.target.value,
@@ -40,7 +40,7 @@ export default {
   },
   beforeDestroy() {
     if (this.mathfield) {
-      // Clean up event listeners or other resources if necessary
+      // 清理事件监听器和其他资源
       this.mathfield.removeEventListener("input", () => {});
     }
   },
