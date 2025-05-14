@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- <math-field ref="mathfield" :options="options" :value="value" @input="onInput" /> -->
     <!-- 这个div将作为MathLive MathfieldElement的容器 -->
     <div ref="mathfield" class="formula-editor-field"></div>
   </div>
@@ -8,6 +9,7 @@
 <script>
 // 从MathLive库导入MathfieldElement
 import { MathfieldElement } from "mathlive"
+import _ from "lodash"
 
 export default {
   name: "FormulaEditor",
@@ -23,11 +25,6 @@ export default {
       type: String,
       default: "",
     },
-    // MathLive实例的选项，允许从父组件进行自定义
-    options: {
-      type: Object,
-      default: () => ({ virtualKeyboardMode: "manual" }),
-    },
   },
   data() {
     return {
@@ -41,13 +38,25 @@ export default {
     // 创建MathfieldElement的新实例
     // 如果可能，直接将初始选项传递给构造函数，或者之后立即设置
     const mfe = new MathfieldElement({
-      ...(this.options || { virtualKeyboardMode: "manual" }), // Spread default and passed options
-      menuItems: this.options.menuItems || ["undo", "redo", "cut", "copy", "paste", "selectAll"], // 优先使用options中的menuItems配置
-      macros: {}, // 防止宏定义错误
+      virtualKeyboardMode: "manual",
+      menuItems: ["undo", "redo", "cut", "copy", "paste", "selectAll"],
+      menuItemState: {
+        undo: "enabled",
+        redo: "enabled",
+        cut: "enabled",
+        copy: "enabled",
+        paste: "enabled",
+        selectAll: "enabled",
+      },
+      virtualKeyboardToggleGlyph: "",
+      virtualKeyboardToolbar: ""
+      ,
+
+      // macros: {}, // 防止宏定义错误
       onError: (error) => {
-        console.error('MathLive Error:', error);
-        this.$emit('error', error); // 触发错误事件
-      }
+        console.error("MathLive Error:", error)
+        this.$emit("error", error) // 触发错误事件
+      },
     })
 
     // 从'value'属性设置mathfield的初始值
@@ -61,32 +70,38 @@ export default {
 
     // 监听mathfield元素本身的"input"事件
     // 添加菜单事件监听
-    this.mathfield.addEventListener('menu-item-click', (event) => {
-      console.log('Menu item clicked:', event.detail.menuItem);
-    });
-    
+    this.mathfield.addEventListener("menu-item-click", (event) => {
+      console.log("Menu item clicked:", event.detail.menuItem)
+    })
+
+    // 使用防抖优化输入事件处理
+    const debounceEmit = _.debounce((latex, mathjson, expression) => {
+      this.$emit("formula-updated", { latex, mathjson, expression })
+    }, 300)
+
     this.mathfield.addEventListener("input", (event) => {
       const mathfieldElement = event.target
       const newLatexValue = mathfieldElement.value
-      this.internalValue = newLatexValue // Update internal state first
+      this.internalValue = newLatexValue
 
-      // 触发'input'事件以实现v-model兼容性，传递新的LaTeX值
+      // 立即触发input事件实现v-model
       this.$emit("input", newLatexValue)
 
-      // 触发更详细的"formula-updated"事件供其他消费者使用(如MainPage进行计算)
-      console.log("%c Line:79 🥖 newLatexValue", "color:#ed9ec7", newLatexValue);
-      this.$emit("formula-updated", {
-        latex: newLatexValue,
-        mathjson: mathfieldElement.getValue("math-json"),
-        expression: mathfieldElement.expression,
-      })
+      // 防抖处理formula-updated事件
+      debounceEmit(newLatexValue, mathfieldElement.getValue("math-json"), mathfieldElement.expression)
     })
   },
   beforeDestroy() {
-    // 必要时进行清理
-    // 如果输入事件监听器绑定了特定处理程序，则应移除
-    // e.g., this.mathfield.removeEventListener("input", this.handleMathInput);
-    // 但是，MathLive元素在从DOM移除时可能会清理自己的监听器
+    // 清理防抖函数
+    if (this.debounceEmit && this.debounceEmit.cancel) {
+      this.debounceEmit.cancel()
+    }
+
+    // 移除事件监听器
+    if (this.mathfield) {
+      this.mathfield.removeEventListener("input", this.handleMathInput)
+      this.mathfield.removeEventListener("menu-item-click", this.handleMenuItemClick)
+    }
   },
   watch: {
     // 监听'value'属性的外部变化(例如父组件更新它)
