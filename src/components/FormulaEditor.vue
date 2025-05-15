@@ -5,16 +5,16 @@
     <div ref="mathfield" class="formula-editor-field"></div>
   </div>
 </template>
-
 <script>
 // 从MathLive库导入MathfieldElement
-import { MathfieldElement } from "mathlive"
+// import { MathfieldElement } from "mathlive"
+// import MathLiveJS from "@/mathlive/mathlive.min.js"
 import _ from "lodash"
 
 export default {
   name: "FormulaEditor",
   // 定义Vue 2中v-model兼容的模型配置
-  // 这告诉Vue使用'value'属性和'input'事件来实现v-model
+  // 这告诉Vue使用'value'属性和'input'事件来实现v-model3
   model: {
     prop: "value",
     event: "input",
@@ -32,26 +32,20 @@ export default {
       mathfield: null,
       // internalValue用于防止与watcher的更新循环
       internalValue: this.value,
+      latexValue: "",
     }
   },
   mounted() {
-    // 创建MathfieldElement的新实例
-    // 如果可能，直接将初始选项传递给构造函数，或者之后立即设置
+    // 执行 MathLive 源码
+    // const script = document.createElement("script")
+    // script.textContent = MathLiveJS
+    // document.head.appendChild(script)
+
+    /* eslint-enable no-undef */
     const mfe = new MathfieldElement({
       virtualKeyboardMode: "manual",
-      menuItems: ["undo", "redo", "cut", "copy", "paste", "selectAll"],
-      menuItemState: {
-        undo: "enabled",
-        redo: "enabled",
-        cut: "enabled",
-        copy: "enabled",
-        paste: "enabled",
-        selectAll: "enabled",
-      },
       virtualKeyboardToggleGlyph: "",
-      virtualKeyboardToolbar: ""
-      ,
-
+      virtualKeyboardToolbar: "",
       // macros: {}, // 防止宏定义错误
       onError: (error) => {
         console.error("MathLive Error:", error)
@@ -64,12 +58,9 @@ export default {
 
     // 将MathfieldElement实例附加到"mathfield"引用的DOM元素
     this.$refs.mathfield.appendChild(mfe)
-
     // 存储MathfieldElement实例
     this.mathfield = mfe
-
     // 监听mathfield元素本身的"input"事件
-    // 添加菜单事件监听
     this.mathfield.addEventListener("menu-item-click", (event) => {
       console.log("Menu item clicked:", event.detail.menuItem)
     })
@@ -91,6 +82,8 @@ export default {
       debounceEmit(newLatexValue, mathfieldElement.getValue("math-json"), mathfieldElement.expression)
     })
   },
+
+  methods: {},
   beforeDestroy() {
     // 清理防抖函数
     if (this.debounceEmit && this.debounceEmit.cancel) {

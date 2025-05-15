@@ -8,9 +8,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@cortex-js/compute-engine": "^0.15.0",
-    "core-js": "^3.8.3",
-    "mathlive": "^0.105.2",
+    "@cortex-js/compute-engine": "^0.29.1",
+    "mathlive": "^0.105.3",
     "vue": "^2.7.0"
   },
   "devDependencies": {

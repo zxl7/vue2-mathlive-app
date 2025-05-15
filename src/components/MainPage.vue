@@ -73,12 +73,12 @@ export default {
     // 定义可能在公式中使用的常用函数或常量
     // 这有助于防止常见数学函数出现'invalid-identifier'错误，特别是那些非内置或需要特定大小写的函数
     // this.computeEngine.defineSymbol("sin", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Sin", ops[0]]) })
-    this.computeEngine.defineSymbol("cos", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Cos", ops[0]]) })
-    this.computeEngine.defineSymbol("tan", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Tan", ops[0]]) })
-    this.computeEngine.defineSymbol("ln", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Log", ops[0]]) }) // Natural log
-    this.computeEngine.defineSymbol("log", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Log", ops[0], this.computeEngine.box(10)]) }) // Base 10 log
-    this.computeEngine.defineSymbol("pi", { domain: "RealNumbers", value: Math.PI })
-    this.computeEngine.defineSymbol("e", { domain: "RealNumbers", value: Math.E })
+    // this.computeEngine.defineSymbol("cos", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Cos", ops[0]]) })
+    // this.computeEngine.defineSymbol("tan", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Tan", ops[0]]) })
+    // this.computeEngine.defineSymbol("ln", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Log", ops[0]]) }) // Natural log
+    // this.computeEngine.defineSymbol("log", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Log", ops[0], this.computeEngine.box(10)]) }) // Base 10 log
+    // this.computeEngine.defineSymbol("pi", { domain: "RealNumbers", value: Math.PI })
+    // this.computeEngine.defineSymbol("e", { domain: "RealNumbers", value: Math.E })
   },
   methods: {
     // 处理来自FormulaEditor.vue的'formula-updated'事件
@@ -119,32 +119,43 @@ export default {
 
       try {
         const scope = {}
+        let hasInvalidVariable = false
+
+        // 构建变量作用域并验证所有变量
         this.definedVariables.forEach((variable) => {
           const varName = variable.name.trim()
           if (varName) {
-            // Ensure variable names are valid identifiers for Compute Engine
-            // Simple check: replace non-alphanumeric with underscore, ensure starts with letter or underscore
-            // More robust sanitization might be needed depending on allowed variable names.
-            // For now, we assume variable names from VariableManager are reasonably valid.
+            // 严格的变量名验证规则
+            if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
+              this.calculationError = `变量名'${varName}'无效: 必须以字母或下划线开头，且只能包含字母、数字和下划线`
+              this.calculationResult = null
+              hasInvalidVariable = true
+              return
+            }
+
             const val = parseFloat(variable.value.toString().trim())
             if (!isNaN(val)) {
               scope[varName] = val
             } else {
-              // If not a number, treat as a string symbol if CE is configured for it, or error out.
-              // For now, we'll pass it as is, CE might interpret it or error.
-              // Consider if string variables should be explicitly boxed or handled.
+              // 非数字值处理
               scope[varName] = this.computeEngine.box(["Error", "'unknown-symbol'", varName])
+              hasInvalidVariable = true
             }
           }
         })
+
+        // 如果存在无效变量，提前返回
+        if (hasInvalidVariable) {
+          return
+        }
 
         let expr
         // 优先使用来自MathLive的直接表达式（可用且是最新的）
         if (this.currentExpression && this.currentExpression.latex === this.currentLatexFormula) {
           expr = this.currentExpression
         } else {
-          // Otherwise, parse the LaTeX from v-model
-          // This ensures that programmatic changes to currentLatexFormula are also handled correctly.
+          //解析v-model中的LaTeX
+          //这确保了对currentLatexFormula的编程更改也被正确处理。
           expr = this.computeEngine.parse(this.currentLatexFormula)
         }
 
@@ -154,9 +165,8 @@ export default {
           return
         }
 
-        // Substitute variables and evaluate
+        // 替换变量并求值
         const result = expr.subs(scope).evaluate()
-
         if (result !== null && result !== undefined) {
           if (result.isError) {
             this.calculationError = `计算错误: ${result.errorName || result.toString()}`
@@ -199,7 +209,6 @@ export default {
 </script>
 
 <style scoped>
-/* Scoped styles for the MainPage component */
 .main-page {
   display: flex;
   flex-direction: column;
@@ -209,41 +218,40 @@ export default {
 }
 .content-wrapper {
   display: flex;
-  flex-direction: column; /* Stack sections vertically on small screens */
-  gap: 20px; /* Space between sections */
+  flex-direction: column;
+  gap: 20px;
   width: 100%;
-  max-width: 1200px; /* Max width for larger screens */
+  max-width: 1200px;
 }
 
-/* Responsive layout for wider screens */
 @media (min-width: 768px) {
   .content-wrapper {
-    flex-direction: row; /* Place sections side-by-side */
-    justify-content: space-around; /* Distribute space around sections */
+    flex-direction: row;
+    justify-content: space-around;
   }
   .editor-section,
   .controls-section {
-    width: 48%; /* Assign roughly half width to each section */
+    width: 48%;
   }
 }
 
 .editor-section,
 .controls-section {
   padding: 15px;
-  border: 1px solid #ddd; /* Light grey border */
-  border-radius: 8px; /* Rounded corners */
-  background-color: #f9f9f9; /* Light background for sections */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .output-display {
   margin-top: 15px;
   padding: 10px;
-  background-color: #e9e9e9; /* Slightly darker background for output displays */
+  background-color: #e9e9e9;
   border-radius: 4px;
-  word-break: break-all; /* Prevent long strings from breaking layout */
+  word-break: break-all;
   font-size: 0.9em;
-  font-family: monospace; /* Monospace font for code-like output */
+  font-family: monospace;
 }
 
 .output-display strong {
@@ -254,8 +262,8 @@ export default {
 
 button {
   margin-top: 20px;
-  padding: 10px 18px; /* Adjusted padding */
-  background-color: #5cb85c; /* A pleasant green */
+  padding: 10px 18px;
+  background-color: #5cb85c;
   color: white;
   border: none;
   border-radius: 4px;
@@ -265,11 +273,11 @@ button {
 }
 
 button:hover {
-  background-color: #4cae4c; /* Darker green on hover */
+  background-color: #4cae4c;
 }
 
 h1 {
-  margin-bottom: 25px; /* Adjusted margin */
+  margin-bottom: 25px;
   color: #333;
 }
 
