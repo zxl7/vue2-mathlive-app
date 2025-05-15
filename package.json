@@ -11,6 +11,8 @@
     "@cortex-js/compute-engine": "^0.15.0",
     "core-js": "^3.8.3",
     "mathlive": "^0.105.2",
+    "num": "^0.3.0",
+    "nvm": "^0.0.4",
     "vue": "^2.7.0"
   },
   "devDependencies": {
