@@ -4,6 +4,8 @@
 
 Vue2 MathLive 动态公式计算器是一个基于 Vue2 和 MathLive 库的动态公式计算器应用程序。它允许用户输入和编辑数学公式，并实时显示公式的解析结果。
 
+<img src="./src/assets/ex.png" alt="1">
+
 ## 功能特性
 
 - 支持常见的数学公式输入和编辑。
@@ -31,5 +33,3 @@ Vue2 MathLive 动态公式计算器是一个基于 Vue2 和 MathLive 库的动�
 1. 克隆或下载项目代码。
 2. 安装依赖：npm install
 3. 启动开发服务器：npm run serve
-
-<img src="./src/assets/ex.png" alt="1">
