@@ -1,86 +1,35 @@
 # Vue2 MathLive 动态公式计算器
 
-This project is a Vue 2 application that integrates MathLive for formula editing and uses Compute Engine for dynamic calculations based on user-defined variables.
+## 项目介绍
 
-## Project Setup
+Vue2 MathLive 动态公式计算器是一个基于 Vue2 和 MathLive 库的动态公式计算器应用程序。它允许用户输入和编辑数学公式，并实时显示公式的解析结果。
 
-### Prerequisites
+## 功能特性
 
-- Node.js (version 16.x or higher recommended)
-- Yarn (or npm)
+- 支持常见的数学公式输入和编辑。
+- 实时显示公式的解析结果。
+- 支持公式的复制、粘贴和删除操作。
+- 支持公式的撤销和重做操作。
+- 支持公式的保存和加载操作。
+- 支持公式的导出和导入操作。
+- 支持公式的打印操作。
+- 支持公式的导出为图片操作。
+- 支持公式的导出为 LaTeX 操作。
+- 支持公式的导出为 MathML 操作。
+- 支持公式的导出为 MathJSON 操作。
+- 支持公式的导出为 MathJS 操作。
+- 支持公式的导出为 MathTeX 操作。
 
-### Installation
+## 技术栈
 
-1. Clone the repository (if applicable) or extract the source code archive.
-2. Navigate to the project directory:
-   ```sh
-   cd vue2-mathlive-app
-   ```
-3. Install dependencies:
-   ```sh
-   yarn install
-   # or
-   npm install
-   ```
+- Vue2
+- MathLive
+- Element UI
 
-## Development Server
+## 安装和使用
 
-To start the development server, run:
+1. 克隆或下载项目代码。
+2. 安装依赖：npm install
+3. 启动开发服务器：npm run serve
 
-```sh
-yarn serve
-# or
-npm run serve
-```
-
-This will typically start the server at `http://localhost:8080/`.
-
-## Build for Production
-
-To build the application for production, run:
-
-```sh
-yarn build
-# or
-npm run build
-```
-
-This will create a `dist` directory with the production-ready files.
-
-## Project Structure
-
-- `public/`: Contains static assets like `index.html` and `favicon.ico`.
-- `src/`: Contains the main application source code.
-  - `assets/`: (Optional) For static assets imported by components.
-  - `components/`: Contains Vue components.
-    - `CalculationDisplay.vue`: Displays the calculation result or error.
-    - `FormulaEditor.vue`: Integrates MathLive for formula input.
-    - `MainPage.vue`: The main page orchestrating the components and logic.
-    - `VariableManager.vue`: Allows users to define and manage variables.
-  - `App.vue`: The root Vue component.
-  - `main.js`: The main entry point for the Vue application.
-- `babel.config.js`: Babel configuration.
-- `package.json`: Project dependencies and scripts.
-- `vue.config.js`: Vue CLI configuration (e.g., dev server settings).
-- `.gitignore`: Specifies intentionally untracked files that Git should ignore.
-- `README.md`: This file.
-
-## Key Features
-
-- **Formula Editing**: Uses MathLive for a rich formula editing experience.
-- **Variable Definition**: Allows users to define variables (e.g., `x = 10`, `y = 5`).
-- **Dynamic Calculation**: Uses Compute Engine to parse LaTeX/MathJSON formulas and evaluate them with the defined variables.
-- **Real-time Updates**: Changes in formulas or variables trigger recalculations or update displays.
-
-## How it Works
-
-1.  The `FormulaEditor.vue` component uses MathLive to capture formula input in both LaTeX and MathJSON formats.
-2.  The `VariableManager.vue` component allows users to add, remove, and modify variables (name-value pairs).
-3.  The `MainPage.vue` component receives updates from both the formula editor and variable manager.
-4.  When the user triggers a calculation:
-    *   It prepares a `scope` object from the defined variables.
-    *   It uses `ComputeEngine.box()` (for MathJSON) or `ComputeEngine.parse()` (for LaTeX) to create an expression object.
-    *   It calls `expr.subs(scope).evaluate()` to substitute variables and compute the result.
-5.  The `CalculationDisplay.vue` component shows the final result or any errors encountered during the process.
-
-# vue2-mathlive-app
+<img src="./src/assets/ex.png" alt="1">
