@@ -38,7 +38,7 @@
 import FormulaEditor from "./FormulaEditor.vue"
 import VariableManager from "./VariableManager.vue"
 import CalculationDisplay from "./CalculationDisplay.vue"
-import { ComputeEngine } from "@cortex-js/compute-engine"
+// import { ComputeEngine } from "../mathlive/math-json.min.cjs"
 
 export default {
   name: "MainPage",
@@ -67,9 +67,9 @@ export default {
     },
   },
   created() {
-    // 组件实例创建时调用的生命周期钩子
     // 初始化一个新的Compute Engine实例
-    this.computeEngine = new ComputeEngine()
+    this.computeEngine = new this.$computeEngine.ComputeEngine()
+    // this.computeEngine = new ComputeEngine()
     // 定义可能在公式中使用的常用函数或常量
     // 这有助于防止常见数学函数出现'invalid-identifier'错误，特别是那些非内置或需要特定大小写的函数
     // this.computeEngine.defineSymbol("sin", { domain: "Functions", evaluate: (ops) => this.computeEngine.box(["Sin", ops[0]]) })

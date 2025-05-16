@@ -41,7 +41,7 @@ export default {
     // script.textContent = MathLiveJS
     // document.head.appendChild(script)
 
-    /* eslint-enable no-undef */
+    // eslint-disable-next-line no-undef
     const mfe = new MathfieldElement({
       virtualKeyboardMode: "manual",
       virtualKeyboardToggleGlyph: "",
