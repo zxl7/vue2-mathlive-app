@@ -11,7 +11,7 @@
         <!-- 当前LaTeX公式显示区域(通过v-model绑定) -->
         <div class="output-display">
           <strong>LaTeX (v-model):</strong>
-          {{ currentLatexFormula }}
+          <math-field read-only>{{ currentLatexFormula }}</math-field>
         </div>
         <!-- 当前公式的MathJSON表示显示区域 -->
         <div class="output-display">
@@ -156,7 +156,7 @@ export default {
         } else {
           //解析v-model中的LaTeX
           //这确保了对currentLatexFormula的编程更改也被正确处理。
-          expr = this.computeEngine.parse(this.currentLatexFormula)
+          expr = this.computeEngine.parse(this.currentLatexFormula.replace(/^[^=]*=/, ""))
         }
 
         if (!expr || typeof expr.evaluate !== "function") {
